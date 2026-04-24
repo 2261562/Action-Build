@@ -6,7 +6,7 @@ on:
         type: choice
         description: "配置文件"
         required: true
-        default: oneplus_ace2_pro_b
+        default: oneplus_ace_3v_b
         options:
           - oneplus_nord_n30_se_5g_v
           - oneplus_10r_v
@@ -61,6 +61,11 @@ on:
           - oneplus_15_aosp
           - oneplus_15t
           - oneplus_15t_aosp
+      KERNELSU:
+        type: boolean
+        description: "是否启用KernelSU(SukiSU Ultra)？"
+        required: true
+        default: false
       MANAGER_SOURCE:
         type: choice
         description: "管理器调用方向"
@@ -671,6 +676,7 @@ jobs:
           git commit -m "Random suffix & remove -dirty"
 
       - name: Resolve Manager Source
+        if: ${{ github.event.inputs.KERNELSU == 'true' }}
         id: manager
         run: |
           MANAGER_SOURCE="${{ github.event.inputs.MANAGER_SOURCE }}"
@@ -698,6 +704,7 @@ jobs:
           echo "manager_artifact=$ARTIFACT" >> "$GITHUB_OUTPUT"
 
       - name: Add SukiSU Ultra
+        if: ${{ github.event.inputs.KERNELSU == 'true' }}
         run: |
           cd kernel_workspace/kernel_platform
           MANAGER_BRANCH="${{ steps.manager.outputs.manager_branch }}"
@@ -778,6 +785,7 @@ jobs:
           echo "::endgroup::"
 
       - name: Apply Patches SukiSU Ultra
+        if: ${{ github.event.inputs.KERNELSU == 'true' }}
         env:
           FILE: ${{ github.event.inputs.FILE }}
         run: |
@@ -1020,31 +1028,33 @@ jobs:
           CONFIG_FILE=./arch/arm64/configs/gki_defconfig
           KERNEL_VERSION="${{ env.KERNEL_VERSION }}"
 
-          # SukiSU Ultra配置
-          echo "CONFIG_KSU=y" >> "$CONFIG_FILE"
+          # SukiSU Ultra配置（仅在启用 KernelSU 时生效）
+          if [ "${{ github.event.inputs.KERNELSU }}" = "true" ]; then
+            echo "CONFIG_KSU=y" >> "$CONFIG_FILE"
 
-          # KPM配置
-          if [ "${{ github.event.inputs.KPM }}" = "KPM" ] || [ "${{ github.event.inputs.KPM }}" = "N/A" ]; then
-            echo "CONFIG_KPM=y" >> "$CONFIG_FILE"
-          fi
-          if [ "${{ github.event.inputs.KPM }}" = "KPN" ]; then
-            echo "CONFIG_KPM=n" >> "$CONFIG_FILE"
-          fi
+            # KPM配置
+            if [ "${{ github.event.inputs.KPM }}" = "KPM" ] || [ "${{ github.event.inputs.KPM }}" = "N/A" ]; then
+              echo "CONFIG_KPM=y" >> "$CONFIG_FILE"
+            fi
+            if [ "${{ github.event.inputs.KPM }}" = "KPN" ]; then
+              echo "CONFIG_KPM=n" >> "$CONFIG_FILE"
+            fi
 
-          # SUSFS配置
-          if [ "${{ github.event.inputs.SUSFS_META }}" != "-1" ]; then
-            echo "CONFIG_KSU_SUSFS=y" >> "$CONFIG_FILE"
-            echo "CONFIG_KSU_SUSFS_SUS_PATH=y" >> "$CONFIG_FILE"
-            echo "CONFIG_KSU_SUSFS_SUS_MAP=y" >> "$CONFIG_FILE"
-            echo "CONFIG_KSU_SUSFS_SUS_MOUNT=y" >> "$CONFIG_FILE"
-            echo "CONFIG_KSU_SUSFS_SUS_KSTAT=y" >> "$CONFIG_FILE"
-            echo "CONFIG_KSU_SUSFS_SPOOF_UNAME=y" >> "$CONFIG_FILE"
-            echo "CONFIG_KSU_SUSFS_ENABLE_LOG=y" >> "$CONFIG_FILE"
-            echo "CONFIG_KSU_SUSFS_HIDE_KSU_SUSFS_SYMBOLS=y" >> "$CONFIG_FILE"
-            echo "CONFIG_KSU_SUSFS_SPOOF_CMDLINE_OR_BOOTCONFIG=y" >> "$CONFIG_FILE"
-            echo "CONFIG_KSU_SUSFS_OPEN_REDIRECT=y" >> "$CONFIG_FILE"
-          else
-            echo "CONFIG_KSU_SUSFS=n" >> "$CONFIG_FILE"
+            # SUSFS配置
+            if [ "${{ github.event.inputs.SUSFS_META }}" != "-1" ]; then
+              echo "CONFIG_KSU_SUSFS=y" >> "$CONFIG_FILE"
+              echo "CONFIG_KSU_SUSFS_SUS_PATH=y" >> "$CONFIG_FILE"
+              echo "CONFIG_KSU_SUSFS_SUS_MAP=y" >> "$CONFIG_FILE"
+              echo "CONFIG_KSU_SUSFS_SUS_MOUNT=y" >> "$CONFIG_FILE"
+              echo "CONFIG_KSU_SUSFS_SUS_KSTAT=y" >> "$CONFIG_FILE"
+              echo "CONFIG_KSU_SUSFS_SPOOF_UNAME=y" >> "$CONFIG_FILE"
+              echo "CONFIG_KSU_SUSFS_ENABLE_LOG=y" >> "$CONFIG_FILE"
+              echo "CONFIG_KSU_SUSFS_HIDE_KSU_SUSFS_SYMBOLS=y" >> "$CONFIG_FILE"
+              echo "CONFIG_KSU_SUSFS_SPOOF_CMDLINE_OR_BOOTCONFIG=y" >> "$CONFIG_FILE"
+              echo "CONFIG_KSU_SUSFS_OPEN_REDIRECT=y" >> "$CONFIG_FILE"
+            else
+              echo "CONFIG_KSU_SUSFS=n" >> "$CONFIG_FILE"
+            fi
           fi
 
           # TMPFS配置*
@@ -1345,7 +1355,7 @@ jobs:
           fi
 
       - name: Apply KPX and Replace Image
-        if: ${{ github.event.inputs.KPM != 'N/A' }}
+        if: ${{ github.event.inputs.KERNELSU == 'true' && github.event.inputs.KPM != 'N/A' }}
         run: |
           KPM_DIR="${GITHUB_WORKSPACE}/kernel_workspace/SukiSU_patch/kpm"
           # KPM_DIR="${GITHUB_WORKSPACE}/kernel_workspace/Action-Build/patches/kpm"
@@ -1365,7 +1375,7 @@ jobs:
           cp Image "${GITHUB_WORKSPACE}/AnyKernel3/Image"
 
       - name: Download Latest SUSFS Module from CI
-        if: ${{ github.event.inputs.SUSFS_CI == 'CI' && github.event.inputs.SUSFS_META != '-1' }}
+        if: ${{ github.event.inputs.KERNELSU == 'true' && github.event.inputs.SUSFS_CI == 'CI' && github.event.inputs.SUSFS_META != '-1' }}
         continue-on-error: true
         run: |
           LATEST_RUN_ID=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
@@ -1385,13 +1395,14 @@ jobs:
           fi
 
       - name: Download Latest SUSFS Module from Release
-        if: ${{ github.event.inputs.SUSFS_CI == 'Release' && github.event.inputs.SUSFS_META != '-1' }}
+        if: ${{ github.event.inputs.KERNELSU == 'true' && github.event.inputs.SUSFS_CI == 'Release' && github.event.inputs.SUSFS_META != '-1' }}
         continue-on-error: true
         run: |
           wget -O ksu_module_susfs_1.5.2+_Release.zip https://github.com/sidex15/ksu_module_susfs/releases/latest/download/ksu_module_susfs_1.5.2+.zip
           cp ksu_module_susfs_1.5.2+_Release.zip ./AnyKernel3/
 
       - name: Download Latest SukiSU-Ultra APK from CI
+        if: ${{ github.event.inputs.KERNELSU == 'true' }}
         continue-on-error: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
