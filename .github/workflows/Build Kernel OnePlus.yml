@@ -784,6 +784,25 @@ jobs:
           grep -nE '^(REPO_OWNER|REPO_NAME|REPO_BRANCH|KSU_VERSION_API|KSU_VERSION_FULL|VERSION_TAG|GIT_BIN|CURL_BIN)' kernel/Makefile
           echo "::endgroup::"
 
+      # 拉取公共依赖仓库（被多个步骤依赖，无条件执行）
+      - name: Clone Shared Repositories
+        run: |
+          cd kernel_workspace
+          if [ "${{ github.event.inputs.RE_KERNEL }}" = "true" ]; then
+            git clone https://github.com/Sakion-Team/Re-Kernel.git
+          fi
+          git clone https://github.com/ShirkNeko/SukiSU_patch.git
+          git clone https://github.com/Numbersf/Action-Build.git
+
+          cd kernel_platform
+          if [[ "${{ github.event.inputs.ZRAM }}" == 1* ]]; then
+            echo "正在拉取zram补丁"
+            cp -r ../SukiSU_patch/other/zram/lz4k/include/linux/* ./common/include/linux/
+            cp -r ../SukiSU_patch/other/zram/lz4k/lib/* ./common/lib/
+            cp -r ../SukiSU_patch/other/zram/lz4k/crypto/* ./common/crypto/
+            cp -r ../SukiSU_patch/other/zram/lz4k_oplus ./common/lib/
+          fi
+
       - name: Apply Patches SukiSU Ultra
         if: ${{ github.event.inputs.KERNELSU == 'true' }}
         env:
@@ -805,25 +824,12 @@ jobs:
             fi
             cd ..
           fi
-          if [ "${{ github.event.inputs.RE_KERNEL }}" = "true" ]; then
-            git clone https://github.com/Sakion-Team/Re-Kernel.git
-          fi
-          git clone https://github.com/ShirkNeko/SukiSU_patch.git
-          git clone https://github.com/Numbersf/Action-Build.git
           cd kernel_platform
           if [ "${{ github.event.inputs.SUSFS_META }}" != "-1" ]; then
             echo "正在拉取susfs补丁"
             cp ../susfs4ksu/kernel_patches/50_add_susfs_in_gki-${{ env.KANDROID_VERSION }}-${{ env.KERNEL_VERSION }}.patch ./common/
             cp ../susfs4ksu/kernel_patches/fs/* ./common/fs/
             cp ../susfs4ksu/kernel_patches/include/linux/* ./common/include/linux/
-          fi
-
-          if [[ "${{ github.event.inputs.ZRAM }}" == 1* ]]; then
-            echo "正在拉取zram补丁"
-            cp -r ../SukiSU_patch/other/zram/lz4k/include/linux/* ./common/include/linux/
-            cp -r ../SukiSU_patch/other/zram/lz4k/lib/* ./common/lib/
-            cp -r ../SukiSU_patch/other/zram/lz4k/crypto/* ./common/crypto/
-            cp -r ../SukiSU_patch/other/zram/lz4k_oplus ./common/lib/
           fi
 
           cd ./common
