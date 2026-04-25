@@ -1127,12 +1127,12 @@ jobs:
             # echo "CONFIG_IPVLAN=y" >> "$CONFIG_FILE"
             # echo "CONFIG_MACVLAN=y" >> "$CONFIG_FILE"
             # echo "CONFIG_USER_NS=y" >> "$CONFIG_FILE"
+            # echo "CONFIG_CGROUP_PIDS=y" >> "$CONFIG_FILE"
 
             # echo "CONFIG_BRIDGE_NETFILTER=y" >> "$CONFIG_FILE"
             # echo "CONFIG_IP_NF_FILTER=y" >> "$CONFIG_FILE"
             # echo "CONFIG_NETFILTER_XT_MATCH_IPVS=y" >> "$CONFIG_FILE"
             echo "CONFIG_CGROUP_DEVICE=y" >> "$CONFIG_FILE"
-            # echo "CONFIG_CGROUP_PIDS=y" >> "$CONFIG_FILE"
           fi
 
           # IPSET & IPv6_NAT配置*
@@ -1358,6 +1358,18 @@ jobs:
         run: |
           git clone https://github.com/Numbersf/AnyKernel3 --depth=1
           rm -rf ./AnyKernel3/.git
+
+          # 非 KernelSU 构建时，清除安装脚本中的 KSU 专属逻辑
+          if [ "${{ github.event.inputs.KERNELSU }}" != "true" ]; then
+            cd ./AnyKernel3
+            # 移除 ksu_supported 检测与 abort（第31-41行区域）
+            sed -i '/^kernel_version=.*\/proc\/version/,/abort.*Non-GKI/d' anykernel.sh
+            # 移除 Magisk 残留检测警告（第44-81行区域）
+            sed -i '/if \[ -d \/data\/adb\/magisk \]/,/^fi$/d' anykernel.sh
+            # 移除 SUSFS 模块安装逻辑（第95-146行区域）
+            sed -i '/ksu_module_susfs/,/^fi$/d' anykernel.sh
+            cd ..
+          fi
           mkdir -p kernel_workspace/kernel_platform/out/Final-Image-Find/
           image_path=""
           if [ -d "./kernel_workspace/kernel_platform/common/out/" ]; then
