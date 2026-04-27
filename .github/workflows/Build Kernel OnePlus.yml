@@ -1190,6 +1190,15 @@ jobs:
             echo "你的设备不支持 IPv6 NAT，跳过此步骤。"
           fi
 
+      - name: Apply Bridge Netfilter KABI Patch
+        run: |
+          PATCH_DIR="${GITHUB_WORKSPACE}/kernel_workspace/Action-Build/patches"
+          cd kernel_workspace/kernel_platform/common
+
+          echo "正在打 sk_buff KABI 修复补丁..."
+          patch -p1 --forward < "${PATCH_DIR}/fix_skb_kabi.patch" || true
+          echo "sk_buff KABI 修复完成！"
+
       # Custom kernel build time, without adding #1 SMP PREEMPT 自定义内核构建时间，不要加入#1 SMP PREEMPT
       - name: Custom BUILD_TIME
         shell: bash
