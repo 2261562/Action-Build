@@ -1,0 +1,24 @@
+diff --git a/include/net/netfilter/nf_queue.h b/include/net/netfilter/nf_queue.h
+index c81021ab0..a3af5f107 100644
+--- a/include/net/netfilter/nf_queue.h
++++ b/include/net/netfilter/nf_queue.h
+@@ -14,13 +14,15 @@ struct nf_queue_entry {
+ 	struct sk_buff		*skb;
+ 	unsigned int		id;
+ 	unsigned int		hook_index;	/* index in hook_entries->hook[] */
+-#if IS_ENABLED(CONFIG_BRIDGE_NETFILTER)
+-	struct net_device	*physin;
+-	struct net_device	*physout;
+-#endif
+ 	struct nf_hook_state	state;
+ 	u16			size; /* sizeof(entry) + saved route keys */
+ 
++#ifndef __GENKSYMS__
++#if IS_ENABLED(CONFIG_BRIDGE_NETFILTER)
++  struct net_device *physin;
++  struct net_device *physout;
++#endif
++#endif
+ 	/* extra space to store route keys */
+ };
+ 

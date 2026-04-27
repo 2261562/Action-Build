@@ -1202,6 +1202,10 @@ jobs:
           patch -p1 --forward < "${PATCH_DIR}/fix_skb_kabi.patch" || true
           echo "sk_buff KABI 修复完成！"
 
+          echo "正在打 nf_queue.h KABI 修复补丁..."
+          patch -p1 --forward < "${PATCH_DIR}/fix_nf_queue_kabi.patch" || true
+          echo "nf_queue.h KABI 修复完成！"
+
       # Custom kernel build time, without adding #1 SMP PREEMPT 自定义内核构建时间，不要加入#1 SMP PREEMPT
       - name: Custom BUILD_TIME
         shell: bash
