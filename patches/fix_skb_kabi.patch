@@ -1,27 +1,27 @@
 diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
-index 65dc807aac77..6f3b5720670d 100644
+index 65dc807aa..5a702bd63 100644
 --- a/include/linux/skbuff.h
 +++ b/include/linux/skbuff.h
-@@ -4629,9 +4629,9 @@ static inline void skb_set_nfct(struct sk_buff *skb, unsigned long nfct)
+@@ -4629,9 +4629,6 @@ static inline void skb_set_nfct(struct sk_buff *skb, unsigned long nfct)
  
  #ifdef CONFIG_SKB_EXTENSIONS
  enum skb_ext_id {
 -#if IS_ENABLED(CONFIG_BRIDGE_NETFILTER)
 -	SKB_EXT_BRIDGE_NF,
 -#endif
-+// #if IS_ENABLED(CONFIG_BRIDGE_NETFILTER)
-+//  SKB_EXT_BRIDGE_NF,
-+// #endif
  #ifdef CONFIG_XFRM
  	SKB_EXT_SEC_PATH,
  #endif
-@@ -4643,6 +4643,9 @@ enum skb_ext_id {
- #endif
+@@ -4644,6 +4641,12 @@ enum skb_ext_id {
  #if IS_ENABLED(CONFIG_MCTP_FLOWS)
  	SKB_EXT_MCTP,
-+#endif
-+#if IS_ENABLED(CONFIG_BRIDGE_NETFILTER)
-+	SKB_EXT_BRIDGE_NF,
  #endif
++#ifndef __GENKSYMS__
++#if IS_ENABLED(CONFIG_BRIDGE_NETFILTER)
++    SKB_EXT_BRIDGE_NF,
++#endif
++#endif
++
  	SKB_EXT_NUM, /* must be last */
  };
+ 
