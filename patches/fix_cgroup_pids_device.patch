@@ -1,0 +1,45 @@
+diff --git a/include/linux/cgroup_subsys.h b/include/linux/cgroup_subsys.h
+index 445235487230..460b5b29db4e 100644
+--- a/include/linux/cgroup_subsys.h
++++ b/include/linux/cgroup_subsys.h
+@@ -29,9 +29,9 @@ SUBSYS(io)
+ SUBSYS(memory)
+ #endif
+ 
+-#if IS_ENABLED(CONFIG_CGROUP_DEVICE)
+-SUBSYS(devices)
+-#endif
++// #if IS_ENABLED(CONFIG_CGROUP_DEVICE)
++// SUBSYS(devices)
++// #endif
+ 
+ #if IS_ENABLED(CONFIG_CGROUP_FREEZER)
+ SUBSYS(freezer)
+@@ -53,9 +53,9 @@ SUBSYS(net_prio)
+ SUBSYS(hugetlb)
+ #endif
+ 
+-#if IS_ENABLED(CONFIG_CGROUP_PIDS)
+-SUBSYS(pids)
+-#endif
++// #if IS_ENABLED(CONFIG_CGROUP_PIDS)
++// SUBSYS(pids)
++// #endif
+ 
+ #if IS_ENABLED(CONFIG_CGROUP_RDMA)
+ SUBSYS(rdma)
+@@ -72,6 +72,14 @@ SUBSYS(misc)
+ SUBSYS(debug)
+ #endif
+ 
++#if IS_ENABLED(CONFIG_CGROUP_PIDS)
++SUBSYS(pids)
++#endif
++
++#if IS_ENABLED(CONFIG_CGROUP_DEVICE)
++SUBSYS(devices)
++#endif
++
+ /*
+  * DO NOT ADD ANY SUBSYSTEM WITHOUT EXPLICIT ACKS FROM CGROUP MAINTAINERS.
+  */
