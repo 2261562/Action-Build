@@ -1125,6 +1125,9 @@ jobs:
             # echo "CONFIG_BRIDGE_NETFILTER=m" >> "$CONFIG_FILE" // 无法开启
 
             # 3. 容器资源控制（解决 PIDS 和 DEVICE missing）
+            echo "CONFIG_CGROUP_NET_PRIO=n" >> "$CONFIG_FILE"
+            echo "CONFIG_CGROUP_PIDS=y" >> "$CONFIG_FILE"
+
             # echo "CONFIG_CGROUP_PIDS=y" >> "$CONFIG_FILE"
             # echo "CONFIG_CGROUP_DEVICE=y" >> "$CONFIG_FILE"
 
@@ -1198,9 +1201,9 @@ jobs:
           PATCH_DIR="${GITHUB_WORKSPACE}/kernel_workspace/Action-Build/patches"
           cd kernel_workspace/kernel_platform/common
 
-          echo "正在打 sk_buff KABI 修复补丁..."
-          patch -p1 --forward < "${PATCH_DIR}/fix_skb_kabi.patch" || true
-          echo "sk_buff KABI 修复完成！"
+          echo "尝试修复 PIDS missing…"
+          patch -p1 --forward < "${PATCH_DIR}/fix_cgroup_pids.patch" || true
+          echo "PIDS missing 修复完成！"
 
       # Custom kernel build time, without adding #1 SMP PREEMPT 自定义内核构建时间，不要加入#1 SMP PREEMPT
       - name: Custom BUILD_TIME
