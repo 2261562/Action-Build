@@ -1122,7 +1122,7 @@ jobs:
             echo "CONFIG_USER_NS=y" >> "$CONFIG_FILE"
 
             # 2. Docker 容器间通信（解决 Bridge Netfilter），容器间别名访问需要
-            echo "CONFIG_BRIDGE_NETFILTER=m" >> "$CONFIG_FILE"
+            # echo "CONFIG_BRIDGE_NETFILTER=m" >> "$CONFIG_FILE" // 无法开启
 
             # 3. 容器资源控制（解决 PIDS 和 DEVICE missing）
             # echo "CONFIG_CGROUP_PIDS=y" >> "$CONFIG_FILE"
@@ -1201,10 +1201,6 @@ jobs:
           echo "正在打 sk_buff KABI 修复补丁..."
           patch -p1 --forward < "${PATCH_DIR}/fix_skb_kabi.patch" || true
           echo "sk_buff KABI 修复完成！"
-
-          echo "正在打 nf_queue.h KABI 修复补丁..."
-          patch -p1 --forward < "${PATCH_DIR}/fix_nf_queue_kabi.patch" || true
-          echo "nf_queue.h KABI 修复完成！"
 
       # Custom kernel build time, without adding #1 SMP PREEMPT 自定义内核构建时间，不要加入#1 SMP PREEMPT
       - name: Custom BUILD_TIME
