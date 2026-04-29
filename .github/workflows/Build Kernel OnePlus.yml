@@ -1128,8 +1128,8 @@ jobs:
             # echo "CONFIG_CGROUP_PIDS=y" >> "$CONFIG_FILE"
             # echo "CONFIG_CGROUP_DEVICE=y" >> "$CONFIG_FILE"
 
-            # echo "CONFIG_MEMCG_SWAP=y" >> "$CONFIG_FILE"
-            # echo "CONFIG_MEMCG_SWAP_ENABLED=y" >> "$CONFIG_FILE"
+            echo "CONFIG_MEMCG_SWAP=y" >> "$CONFIG_FILE"
+            echo "CONFIG_MEMCG_SWAP_ENABLED=y" >> "$CONFIG_FILE"
             # echo "CONFIG_IP_VS=y" >> "$CONFIG_FILE"
             # echo "CONFIG_IP_VS_NFCT=y" >> "$CONFIG_FILE"
             # echo "CONFIG_IP_VS_RR=y" >> "$CONFIG_FILE"
