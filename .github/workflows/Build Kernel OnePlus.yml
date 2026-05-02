@@ -1123,13 +1123,27 @@ jobs:
 
             # 2. Docker 容器间通信（解决 Bridge Netfilter），容器间别名访问需要
             # echo "CONFIG_BRIDGE_NETFILTER=m" >> "$CONFIG_FILE" // 无法开启
+            echo "CONFIG_MEMCG_SWAP=y" >> "$CONFIG_FILE"
+            echo "CONFIG_MEMCG_SWAP_ENABLED=y" >> "$CONFIG_FILE"
+
+
+            echo "CONFIG_CGROUPS=y" >> "$CONFIG_FILE"
+            echo "CONFIG_CGROUP_DEVICE=y" >> "$CONFIG_FILE"
+            echo "CONFIG_CGROUP_CPUACCT=y" >> "$CONFIG_FILE"
+            echo "CONFIG_CGROUP_FREEZER=y" >> "$CONFIG_FILE"
+            echo "CONFIG_CGROUP_PIDS=y" >> "$CONFIG_FILE"
+            echo "CONFIG_CGROUP_SCHED=y" >> "$CONFIG_FILE"
+            echo "CONFIG_CGROUP_BLKIO=y" >> "$CONFIG_FILE"
+            echo "CONFIG_CGROUP_PERF=y" >> "$CONFIG_FILE"
+            echo "CONFIG_CGROUP_HUGETLB=y" >> "$CONFIG_FILE"
+            echo "CONFIG_CGROUP_NET_CLASSID=y" >> "$CONFIG_FILE"
+            echo "CONFIG_CGROUP_DEBUG=y" >> "$CONFIG_FILE"
+            echo "CONFIG_CGROUP_DEVICE_DEFAULT_ALLOW=y" >> "$CONFIG_FILE"
 
             # 3. 容器资源控制（解决 PIDS 和 DEVICE missing）
             # echo "CONFIG_CGROUP_PIDS=y" >> "$CONFIG_FILE"
             # echo "CONFIG_CGROUP_DEVICE=y" >> "$CONFIG_FILE"
 
-            echo "CONFIG_MEMCG_SWAP=y" >> "$CONFIG_FILE"
-            echo "CONFIG_MEMCG_SWAP_ENABLED=y" >> "$CONFIG_FILE"
             # echo "CONFIG_IP_VS=y" >> "$CONFIG_FILE"
             # echo "CONFIG_IP_VS_NFCT=y" >> "$CONFIG_FILE"
             # echo "CONFIG_IP_VS_RR=y" >> "$CONFIG_FILE"
