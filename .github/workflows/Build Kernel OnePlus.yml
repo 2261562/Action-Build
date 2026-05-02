@@ -1128,17 +1128,21 @@ jobs:
 
 
             echo "CONFIG_CGROUPS=y" >> "$CONFIG_FILE"
-            echo "CONFIG_CGROUP_DEVICE=y" >> "$CONFIG_FILE"
+            echo "CONFIG_CGROUP_SCHED=y" >> "$CONFIG_FILE"
             echo "CONFIG_CGROUP_CPUACCT=y" >> "$CONFIG_FILE"
             echo "CONFIG_CGROUP_FREEZER=y" >> "$CONFIG_FILE"
-            echo "CONFIG_CGROUP_PIDS=y" >> "$CONFIG_FILE"
-            echo "CONFIG_CGROUP_SCHED=y" >> "$CONFIG_FILE"
             echo "CONFIG_CGROUP_BLKIO=y" >> "$CONFIG_FILE"
-            echo "CONFIG_CGROUP_PERF=y" >> "$CONFIG_FILE"
-            echo "CONFIG_CGROUP_HUGETLB=y" >> "$CONFIG_FILE"
-            echo "CONFIG_CGROUP_NET_CLASSID=y" >> "$CONFIG_FILE"
-            # echo "CONFIG_CGROUP_DEBUG=y" >> "$CONFIG_FILE"
-            # echo "CONFIG_CGROUP_DEVICE_DEFAULT_ALLOW=y" >> "$CONFIG_FILE"
+
+            # 先确保 devtmpfs 存在
+            echo "CONFIG_DEVTMPFS=y" >> "$CONFIG_FILE"
+            echo "CONFIG_DEVTMPFS_MOUNT=y" >> "$CONFIG_FILE"
+
+            # 开启 devices cgroup，并默认允许
+            echo "CONFIG_CGROUP_DEVICE=y" >> "$CONFIG_FILE"
+            echo "CONFIG_CGROUP_DEVICE_DEFAULT_ALLOW=y" >> "$CONFIG_FILE"
+
+            # 开启 pids
+            # echo "CONFIG_CGROUP_PIDS=y" >> "$CONFIG_FILE"
 
             # 3. 容器资源控制（解决 PIDS 和 DEVICE missing）
             # echo "CONFIG_CGROUP_PIDS=y" >> "$CONFIG_FILE"
