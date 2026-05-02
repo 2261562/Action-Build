@@ -1137,8 +1137,8 @@ jobs:
             echo "CONFIG_CGROUP_PERF=y" >> "$CONFIG_FILE"
             echo "CONFIG_CGROUP_HUGETLB=y" >> "$CONFIG_FILE"
             echo "CONFIG_CGROUP_NET_CLASSID=y" >> "$CONFIG_FILE"
-            echo "CONFIG_CGROUP_DEBUG=y" >> "$CONFIG_FILE"
-            echo "CONFIG_CGROUP_DEVICE_DEFAULT_ALLOW=y" >> "$CONFIG_FILE"
+            # echo "CONFIG_CGROUP_DEBUG=y" >> "$CONFIG_FILE"
+            # echo "CONFIG_CGROUP_DEVICE_DEFAULT_ALLOW=y" >> "$CONFIG_FILE"
 
             # 3. 容器资源控制（解决 PIDS 和 DEVICE missing）
             # echo "CONFIG_CGROUP_PIDS=y" >> "$CONFIG_FILE"
