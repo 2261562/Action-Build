@@ -1126,20 +1126,12 @@ jobs:
             echo "CONFIG_MEMCG_SWAP=y" >> "$CONFIG_FILE"
             echo "CONFIG_MEMCG_SWAP_ENABLED=y" >> "$CONFIG_FILE"
 
-
-            echo "CONFIG_CGROUPS=y" >> "$CONFIG_FILE"
-            echo "CONFIG_CGROUP_SCHED=y" >> "$CONFIG_FILE"
-            echo "CONFIG_CGROUP_CPUACCT=y" >> "$CONFIG_FILE"
-            echo "CONFIG_CGROUP_FREEZER=y" >> "$CONFIG_FILE"
-            echo "CONFIG_CGROUP_BLKIO=y" >> "$CONFIG_FILE"
-
             # 先确保 devtmpfs 存在
-            echo "CONFIG_DEVTMPFS=y" >> "$CONFIG_FILE"
-            echo "CONFIG_DEVTMPFS_MOUNT=y" >> "$CONFIG_FILE"
+            # echo "CONFIG_DEVTMPFS_MOUNT=y" >> "$CONFIG_FILE"
 
             # 开启 devices cgroup，并默认允许
             echo "CONFIG_CGROUP_DEVICE=y" >> "$CONFIG_FILE"
-            echo "CONFIG_CGROUP_DEVICE_DEFAULT_ALLOW=y" >> "$CONFIG_FILE"
+            # echo "CONFIG_CGROUP_DEVICE_DEFAULT_ALLOW=y" >> "$CONFIG_FILE"
 
             # 开启 pids
             # echo "CONFIG_CGROUP_PIDS=y" >> "$CONFIG_FILE"
@@ -1216,9 +1208,7 @@ jobs:
           PATCH_DIR="${GITHUB_WORKSPACE}/kernel_workspace/Action-Build/patches"
           cd kernel_workspace/kernel_platform/common
 
-          echo "正在打 sk_buff KABI 修复补丁..."
-          patch -p1 --forward < "${PATCH_DIR}/fix_skb_kabi.patch" || true
-          echo "sk_buff KABI 修复完成！"
+          patch -p1 --forward < "${PATCH_DIR}/fix_cgroup_device_reboot.patch" || true
 
       # Custom kernel build time, without adding #1 SMP PREEMPT 自定义内核构建时间，不要加入#1 SMP PREEMPT
       - name: Custom BUILD_TIME

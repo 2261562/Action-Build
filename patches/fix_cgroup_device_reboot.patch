@@ -1,0 +1,40 @@
+diff --git a/include/linux/cgroup_subsys.h b/include/linux/cgroup_subsys.h
+index 445235487..e3e9c21ba 100644
+--- a/include/linux/cgroup_subsys.h
++++ b/include/linux/cgroup_subsys.h
+@@ -29,9 +29,6 @@ SUBSYS(io)
+ SUBSYS(memory)
+ #endif
+ 
+-#if IS_ENABLED(CONFIG_CGROUP_DEVICE)
+-SUBSYS(devices)
+-#endif
+ 
+ #if IS_ENABLED(CONFIG_CGROUP_FREEZER)
+ SUBSYS(freezer)
+@@ -65,6 +62,10 @@ SUBSYS(rdma)
+ SUBSYS(misc)
+ #endif
+ 
++#if IS_ENABLED(CONFIG_CGROUP_DEVICE)
++SUBSYS(devices)
++#endif
++
+ /*
+  * The following subsystems are not supported on the default hierarchy.
+  */
+diff --git a/security/device_cgroup.c b/security/device_cgroup.c
+index bef2b9285..5e9b9be0f 100644
+--- a/security/device_cgroup.c
++++ b/security/device_cgroup.c
+@@ -838,6 +838,10 @@ static int devcgroup_legacy_check_permission(short type, u32 major, u32 minor,
+ 
+ 	rcu_read_lock();
+ 	dev_cgroup = task_devcgroup(current);
++	if (!dev_cgroup) {
++		rcu_read_unlock();
++		return 0;
++	}
+ 	if (dev_cgroup->behavior == DEVCG_DEFAULT_ALLOW)
+ 		/* Can't match any of the exceptions, even partially */
+ 		rc = !match_exception_partial(&dev_cgroup->exceptions,
